@@ -794,8 +794,8 @@
       <div style="flex:1; background: var(--accent); height: 100%; border-radius: 2px 2px 0 0;"></div>
     </div>
     <div style="display: flex; justify-content: space-between; max-width: 600px; margin: 0 auto 20px;">
-      <div style="font-family: 'DM Mono', monospace; font-size: 9px; color: var(--muted); letter-spacing: 0.1em;">VOR ÜBERNAHME</div>
-      <div style="font-family: 'DM Mono', monospace; font-size: 9px; color: var(--accent); letter-spacing: 0.1em;">NACH ÜBERNAHME →</div>
+      <div style="font-family: 'DM Mono', monospace; font-size: 9px; color: var(--muted); letter-spacing: 0.1em;">VOR JUNI 2024</div>
+      <div style="font-family: 'DM Mono', monospace; font-size: 9px; color: var(--accent); letter-spacing: 0.1em;">AB JUNI 2024 →</div>
     </div>
     <div style="font-size: 14px; color: var(--muted); max-width: 480px; line-height: 1.7; margin: 0 auto;">
       +115% Steigerung pro Folge – bei gleichzeitiger Halbierung der Veröffentlichungsfrequenz.
@@ -850,16 +850,19 @@
     </div>
   </div>
 
-  <div class="section-label" style="margin-top: 60px;">Technologien</div>
+  <div class="section-label" style="margin-top: 60px;">Tools</div>
   <div class="tools-row reveal">
     <span class="tool">Riverside</span>
     <span class="tool">Podigee</span>
     <span class="tool">Auphonic</span>
     <span class="tool">ElevenLabs</span>
+    <span class="tool">Suno</span>
+    <span class="tool">LLMs</span>
     <span class="tool">DaVinci Resolve</span>
     <span class="tool">FinalCut Pro</span>
     <span class="tool">Pro Tools</span>
     <span class="tool">Audacity</span>
+    <span class="tool">Canva</span>
     <span class="tool">Wordpress</span>
   </div>
 </section>
@@ -900,73 +903,69 @@
 <div class="contact-section" id="kontakt">
   <div class="section-label" style="justify-content: center; margin-bottom: 24px;">Zusammenarbeiten</div>
   <h2>Bereit für den<br><em>nächsten Podcast.</em></h2>
-  <p>Du suchst jemanden, mit dem du kreative Formate entwickeln, deinen bestehenden Podcast optimieren oder einen neuen Podcast in Eigenverantwortung produzieren kannst?</p>
+  <p>Du suchst jemanden, mit dem Du kreative Formate entwickeln, Deinen bestehenden Podcast optimieren oder einen neuen Podcast in Eigenverantwortung produzieren kannst?</p>
   <div class="cta-row">
-    <a href="mailto:lennartbrauer@gmx.de" class="btn btn-primary">Mail</a>
+    <a href="/cdn-cgi/l/email-protection#8ee2ebe0e0effcfaecfceffbebfccee9e3f6a0eaeb" class="btn btn-primary">Mail</a>
     <a href="https://www.linkedin.com/in/lennart-brauer" target="_blank" class="btn btn-secondary">LinkedIn</a>
   </div>
   <p style="font-family: 'DM Mono', monospace; font-size: 11px; color: var(--muted); margin-top: 48px; margin-bottom: 0;">
-    <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="9af6fff4f4fbe8eef8e8fbefffe8dafdf7e2b4feff">[email&#160;protected]</a> &nbsp;·&nbsp; +49 152 04225823 &nbsp;·&nbsp; Hamburg
+    lennartbrauer@gmx.de &nbsp;·&nbsp; +49 152 04225823 &nbsp;·&nbsp; Hamburg
   </p>
 </div>
 
 <script>
-  // Waveform generator – run immediately on DOM ready
+(function() {
+  // ── WAVEFORM ──
   function initWaveform() {
-    const waveform = document.getElementById('waveform');
+    var waveform = document.getElementById('waveform');
     if (!waveform) return;
-    const count = Math.floor((window.innerWidth || 800) / 8);
-    for (let i = 0; i < count; i++) {
-      const bar = document.createElement('span');
-      const h = 20 + Math.random() * 160;
-      bar.style.height = h + 'px';
+    var count = Math.floor((window.innerWidth || 800) / 8);
+    for (var i = 0; i < count; i++) {
+      var bar = document.createElement('span');
+      bar.style.height = (20 + Math.random() * 160) + 'px';
       bar.style.animationDelay = (Math.random() * 2) + 's';
       bar.style.animationDuration = (1.2 + Math.random() * 1.4) + 's';
       waveform.appendChild(bar);
     }
   }
 
-  // Scroll reveal – immediately reveal anything already in view,
-  // use rootMargin so elements near the viewport also trigger
+  // ── REVEAL ──
   function initReveal() {
-    const reveals = document.querySelectorAll('.reveal');
+    var reveals = document.querySelectorAll('.reveal');
 
-    // If IntersectionObserver not available, just show everything
-    if (!window.IntersectionObserver) {
-      reveals.forEach(el => el.classList.add('visible'));
-      return;
-    }
+    // Always show everything after 800ms as hard fallback
+    setTimeout(function() {
+      for (var i = 0; i < reveals.length; i++) {
+        reveals[i].classList.add('visible');
+      }
+    }, 800);
 
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
+    if (!window.IntersectionObserver) return;
+
+    var observer = new IntersectionObserver(function(entries) {
+      entries.forEach(function(entry) {
         if (entry.isIntersecting) {
           entry.target.classList.add('visible');
           observer.unobserve(entry.target);
         }
       });
-    }, {
-      threshold: 0,
-      rootMargin: '0px 0px -40px 0px'
-    });
+    }, { threshold: 0, rootMargin: '200px 0px 200px 0px' });
 
-    reveals.forEach(el => observer.observe(el));
-
-    // Fallback: after 300ms, force-reveal anything still invisible
-    // (handles iframe cases where observer never fires)
-    setTimeout(() => {
-      reveals.forEach(el => {
-        const rect = el.getBoundingClientRect();
-        if (rect.top < (window.innerHeight || 800) + 200) {
-          el.classList.add('visible');
-        }
-      });
-    }, 300);
+    for (var j = 0; j < reveals.length; j++) {
+      observer.observe(reveals[j]);
+    }
   }
 
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => { initWaveform(); initReveal(); });
+    document.addEventListener('DOMContentLoaded', function() {
+      initWaveform();
+      initReveal();
+    });
   } else {
     initWaveform();
     initReveal();
   }
+})();
 </script>
+</body>
+</html>
