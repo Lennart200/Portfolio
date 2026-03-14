@@ -1,0 +1,972 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lennart Brauer – Podcast Producer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=DM+Mono:wght@300;400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0e0e0d;
+    --surface: #161614;
+    --card: #1c1c1a;
+    --border: #2a2a27;
+    --accent: #e8c547;
+    --accent2: #c4f0a8;
+    --text: #ede8df;
+    --muted: #7a766c;
+    --loud: #f5f0e8;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 16px;
+    line-height: 1.6;
+    overflow-x: hidden;
+  }
+
+  /* ── NOISE TEXTURE OVERLAY ── */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 9999;
+    opacity: 0.6;
+  }
+
+  /* ── WAVEFORM HERO ── */
+  header {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 80px 60px;
+    position: relative;
+    overflow: hidden;
+    border-bottom: 1px solid var(--border);
+  }
+
+  header .hero-desc { margin: 0 auto; }
+  header .hero-meta { justify-content: center; }
+  header .section-label { justify-content: center; }
+  header .section-label::after { display: none; }
+
+  .waveform-bg {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 200px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    gap: 3px;
+    padding: 0 20px;
+    opacity: 0.12;
+  }
+
+  .waveform-bg span {
+    display: block;
+    width: 4px;
+    background: var(--accent);
+    border-radius: 2px 2px 0 0;
+    animation: wave 1.8s ease-in-out infinite;
+  }
+
+  @keyframes wave {
+    0%, 100% { transform: scaleY(1); }
+    50% { transform: scaleY(0.3); }
+  }
+
+  .hero-tag {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--accent);
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    margin-bottom: 24px;
+    opacity: 0;
+    animation: fadeUp 0.6s ease forwards 0.2s;
+  }
+
+  h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(52px, 8vw, 110px);
+    font-weight: 700;
+    color: var(--loud);
+    line-height: 0.95;
+    letter-spacing: -0.02em;
+    margin-bottom: 32px;
+    opacity: 0;
+    animation: fadeUp 0.7s ease forwards 0.4s;
+  }
+
+  h1 em {
+    font-style: italic;
+    color: var(--accent);
+  }
+
+  .hero-desc {
+    font-size: 18px;
+    color: var(--muted);
+    max-width: 540px;
+    line-height: 1.7;
+    opacity: 0;
+    animation: fadeUp 0.7s ease forwards 0.6s;
+  }
+
+  .hero-meta {
+    margin-top: 48px;
+    display: flex;
+    gap: 40px;
+    flex-wrap: wrap;
+    opacity: 0;
+    animation: fadeUp 0.7s ease forwards 0.8s;
+  }
+
+  .stat {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .stat-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 42px;
+    font-weight: 700;
+    color: var(--accent);
+    line-height: 1;
+  }
+
+  .stat-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-top: 4px;
+  }
+
+  /* ── NAV ── */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    padding: 20px 60px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    backdrop-filter: blur(16px);
+    background: rgba(14,14,13,0.7);
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+  }
+
+  .nav-logo {
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    color: var(--accent);
+    letter-spacing: 0.1em;
+    text-decoration: none;
+  }
+
+  .nav-links {
+    display: flex;
+    gap: 32px;
+    list-style: none;
+  }
+
+  .nav-links a {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    text-decoration: none;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    transition: color 0.2s;
+  }
+
+  .nav-links a:hover { color: var(--accent); }
+
+  /* ── SECTIONS ── */
+  section {
+    padding: 100px 60px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .section-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: var(--accent);
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .section-label::after {
+    content: '';
+    flex: 1;
+    max-width: 60px;
+    height: 1px;
+    background: var(--accent);
+    opacity: 0.4;
+  }
+
+  h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(32px, 4vw, 52px);
+    font-weight: 700;
+    color: var(--loud);
+    line-height: 1.1;
+    margin-bottom: 48px;
+  }
+
+  /* ── CENTER: episodes, formate, live-events sections ── */
+  #arbeiten .section-label,
+  #formate .section-label,
+  #formate h2,
+  #arbeiten h2 {
+    text-align: center;
+    justify-content: center;
+  }
+
+  #arbeiten .section-label::after,
+  #formate .section-label::after { display: none; }
+
+  .format-item { text-align: center; }
+
+  .partnerships { justify-content: center; }
+
+  /* ── CENTER: growth callout internals ── */
+  .growth-callout { text-align: center; }
+  .growth-callout .growth-numbers { justify-content: center; }
+  .growth-callout .growth-text { margin-left: auto; margin-right: auto; }
+
+  /* ── LEFT-ALIGN: skills section below growth callout ── */
+  #skills .section-label { text-align: center; justify-content: center; }
+  #skills .section-label::after { display: none; }
+  #skills h2 { text-align: center; }
+  .skills-layout { text-align: left; }
+  .skill-block h3 { text-align: left; }
+  .skill-list li { text-align: left; }
+
+  /* ── CENTER: episode card contents ── */
+  .episode-card { text-align: center; }
+  .ep-link { justify-content: center; }
+
+  /* ── CENTER: live events description text ── */
+  #formate > p { text-align: center; }
+
+  /* ── CENTER: footer ── */
+  .contact-section { text-align: center; }
+  .contact-section .section-label { justify-content: center; }
+  .contact-section .section-label::after { display: none; }
+  .cta-row { justify-content: center; }
+
+  /* ── PRESS section: center heading only, no line ── */
+  .press-section-label::after { display: none; }
+  .press-section-label { justify-content: center; }
+
+  /* ── FEATURED EPISODES ── */
+  .episodes-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 2px;
+  }
+
+  .episode-card {
+    background: var(--card);
+    padding: 32px;
+    position: relative;
+    overflow: hidden;
+    transition: background 0.25s;
+    border: 1px solid var(--border);
+  }
+
+  .episode-card:hover { background: #222220; }
+
+  .episode-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 3px;
+    height: 0;
+    background: var(--accent);
+    transition: height 0.3s ease;
+  }
+
+  .episode-card:hover::before { height: 100%; }
+
+  .ep-tag {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+
+  .ep-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--loud);
+    line-height: 1.3;
+    margin-bottom: 12px;
+  }
+
+  .ep-desc {
+    font-size: 14px;
+    color: var(--muted);
+    line-height: 1.6;
+    margin-bottom: 20px;
+  }
+
+  .ep-link {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--accent);
+    text-decoration: none;
+    letter-spacing: 0.1em;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: gap 0.2s;
+  }
+
+  .ep-link:hover { gap: 10px; }
+  .ep-link::after { content: '→'; }
+
+  /* ── SKILLS SECTION ── */
+  .skills-layout {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 48px;
+    align-items: start;
+  }
+
+  .skill-block {
+    border-top: 1px solid var(--border);
+    padding-top: 24px;
+  }
+
+  .skill-block h3 {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--accent);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+  }
+
+  .skill-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .skill-list li {
+    font-size: 15px;
+    color: var(--text);
+    padding-left: 16px;
+    position: relative;
+  }
+
+  .skill-list li::before {
+    content: '▸';
+    position: absolute;
+    left: 0;
+    color: var(--accent);
+    font-size: 10px;
+    top: 4px;
+  }
+
+  /* ── FORMATS SECTION ── */
+  .formats-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2px;
+    margin-bottom: 60px;
+  }
+
+  .format-item {
+    background: var(--card);
+    padding: 28px 24px;
+    border: 1px solid var(--border);
+  }
+
+  .format-icon {
+    font-size: 24px;
+    margin-bottom: 12px;
+    display: block;
+  }
+
+  .format-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 18px;
+    color: var(--loud);
+    margin-bottom: 8px;
+  }
+
+  .format-desc {
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.6;
+  }
+
+  /* ── MEDIA PARTNERSHIPS ── */
+  .partnerships {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 32px;
+  }
+
+  .partner-tag {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    padding: 8px 16px;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    letter-spacing: 0.08em;
+    border-radius: 2px;
+    transition: all 0.2s;
+  }
+
+  .partner-tag:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  /* ── TOOLS ── */
+  .tools-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-top: 32px;
+  }
+
+  .tool {
+    background: var(--card);
+    border: 1px solid var(--border);
+    padding: 10px 20px;
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    color: var(--text);
+    letter-spacing: 0.05em;
+    border-radius: 2px;
+  }
+
+  /* ── PRESS / HIGHLIGHTS ── */
+  .press-item {
+    border-top: 1px solid var(--border);
+    padding: 28px 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 40px;
+  }
+
+  .press-item:last-child { border-bottom: 1px solid var(--border); }
+
+  .press-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 20px;
+    color: var(--loud);
+    flex: 1;
+    line-height: 1.3;
+  }
+
+  .press-meta {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    white-space: nowrap;
+    padding-top: 4px;
+  }
+
+  .press-link {
+    color: var(--accent);
+    text-decoration: none;
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.1em;
+  }
+
+  /* ── CONTACT ── */
+  .contact-section {
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+    padding: 100px 60px;
+    text-align: center;
+  }
+
+  .contact-section h2 {
+    font-size: clamp(40px, 6vw, 80px);
+    margin-bottom: 24px;
+  }
+
+  .contact-section p {
+    color: var(--muted);
+    font-size: 18px;
+    max-width: 500px;
+    margin: 0 auto 40px;
+  }
+
+  .cta-row {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .btn {
+    display: inline-block;
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    padding: 16px 32px;
+    text-decoration: none;
+    transition: all 0.2s;
+    border-radius: 2px;
+  }
+
+  .btn-primary {
+    background: var(--accent);
+    color: var(--bg);
+    font-weight: 500;
+  }
+
+  .btn-primary:hover { background: #f0d060; }
+
+  .btn-secondary {
+    border: 1px solid var(--border);
+    color: var(--muted);
+  }
+
+  .btn-secondary:hover {
+    border-color: var(--muted);
+    color: var(--text);
+  }
+
+  /* ── DIVIDER ── */
+  .full-divider {
+    width: 100%;
+    height: 1px;
+    background: var(--border);
+  }
+
+  /* ── ANIMATIONS ── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .reveal {
+    opacity: 0;
+    transform: translateY(24px);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+  }
+
+  .reveal.visible {
+    opacity: 1;
+    transform: none;
+  }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 768px) {
+    header, nav, section, .contact-section { padding-left: 24px; padding-right: 24px; }
+    .formats-grid { grid-template-columns: 1fr; }
+    .skills-layout { grid-template-columns: 1fr; }
+    .press-item { flex-direction: column; gap: 8px; }
+    h1 { font-size: 48px; }
+    .hero-meta { gap: 24px; }
+    nav { padding: 16px 24px; }
+    .nav-links { gap: 16px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="#" class="nav-logo">LB.Portfolio</a>
+  <ul class="nav-links">
+    <li><a href="#arbeiten">Arbeiten</a></li>
+    <li><a href="#formate">Formate</a></li>
+    <li><a href="#skills">Skills</a></li>
+    <li><a href="#kontakt">Kontakt</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<header>
+  <div class="waveform-bg" id="waveform"></div>
+
+  <div class="hero-tag">Podcast Producer · M.A. Media Studies · Executive Assistant · Hamburg</div>
+  <h1>Lennart<br><em>Brauer</em></h1>
+  <p class="hero-desc">
+    Formate (weiter-) entwickeln, Projekte umsetzen, Inhalte auditiv vermitteln – von der ersten Idee bis zum veröffentlichten Feed. 120 Folgen Erfahrung in der Podcast-Produktion, seit 2024 alleinverantwortlich für den Digital-Podcast der Netzpiloten „Tech & Trara."
+  </p>
+
+  <div class="hero-meta">
+    <div class="stat">
+      <span class="stat-num">120</span>
+      <span class="stat-label">Folgen Produktionserfahrung</span>
+    </div>
+    <div class="stat">
+      <span class="stat-num">~850</span>
+      <span class="stat-label">Streams pro Folge</span>
+    </div>
+    <div class="stat">
+      <span class="stat-num">+115%</span>
+      <span class="stat-label">Ø-Streams seit Übernahme</span>
+    </div>
+  </div>
+</header>
+
+<!-- FEATURED EPISODES -->
+<div class="full-divider"></div>
+<section id="arbeiten">
+  <div class="section-label">Ausgewählte Arbeiten</div>
+  <h2>Folgen, die ich<br>besonders mag</h2>
+
+  <div class="episodes-grid reveal">
+
+    <div class="episode-card">
+      <div class="ep-tag">Live-Aufnahme · Galerie</div>
+      <div class="ep-title">Queer Allies or Not – Pride Special</div>
+      <div class="ep-desc">Live-Podiumsgespräch mit Vertreter*Innen der Hamburger Kreativ- und Wirtschaftsszene. Technik, Aufbau und Produktion in Eigenverantwortung.</div>
+      <a href="https://www.netzpiloten.de/queer-allies-or-not-pride-special-the-___-gallery/" target="_blank" class="ep-link">Zur Folge</a>
+    </div>
+
+    <div class="episode-card">
+      <div class="ep-tag">Internationale Konferenz</div>
+      <div class="ep-title">KI & Dekarbonisierung mit Mary Poddar</div>
+      <div class="ep-desc">Aufnahme im Ausland und auf Englisch, internationale Gästin – Vor-Ort-Betreuung und Umsetzung.</div>
+      <a href="https://www.netzpiloten.de/ki-und-dekarbonisierung-geht-das-mit-mary-poddar/" target="_blank" class="ep-link">Zur Folge</a>
+    </div>
+
+    <div class="episode-card">
+      <div class="ep-tag">Kooperation · Brand eins</div>
+      <div class="ep-title">KI als Menschenversteher</div>
+      <div class="ep-desc">Syndication-Folge mit brand eins, produziert im Rahmen der Podcast-Netzwerk-Partnerschaft auf der Work Awesome.</div>
+      <a href="https://www.netzpiloten.de/ki-als-menschenversteher-mit-kenza-ait-si-abbou-matthias-goehler/" target="_blank" class="ep-link">Zur Folge</a>
+    </div>
+
+    <div class="episode-card">
+      <div class="ep-tag">Wahlcheck · Aktuelles Format</div>
+      <div class="ep-title">Digitalpolitik – Welche Ziele verfolgen die Parteien?</div>
+      <div class="ep-desc">Themenspecial zur Bundestagswahl, konzipiert und produziert als eigenständiges Format mit unserem externen Partner „Politik Digital".</div>
+      <a href="https://www.netzpiloten.de/wahlcheck-digitalpolitik-welche-ziele-verfolgen-die-parteien-bei-der-digitalisierung/" target="_blank" class="ep-link">Zur Folge</a>
+    </div>
+
+    <div class="episode-card">
+      <div class="ep-tag">Bildung · Partnerschaft</div>
+      <div class="ep-title">Bildschirm statt Bildung – Wie digital sollte Schule sein?</div>
+      <div class="ep-desc">Pilot-Folge unserer Zusammenarbeit mit dem Jugendbeteiligungsformat „Common Grounds Forum". Zusätzlich zu Produktion auch Betreuung & Koordination der externen Partnerschaft.</div>
+      <a href="https://www.netzpiloten.de/bildschirm-statt-bildung-wie-digital-sollte-schule-sein-mit-gert-mengel-und-emilia-sommer/" target="_blank" class="ep-link">Zur Folge</a>
+    </div>
+
+    <div class="episode-card">
+      <div class="ep-tag">Neues Format · Highlight</div>
+      <div class="ep-title">Gründen zwischen Gen X und Gen Z – Von HTML zu GPT</div>
+      <div class="ep-desc">Start eines neuen Formats rund um Generationenunterschiede, Gründung und KI. Unsere erfolgreichste Folge.</div>
+      <a href="https://www.netzpiloten.de/gruenden-zwischen-gen-x-und-gen-z-von-html-zu-gpt-mit-julian-windeck-wolfgang-macht-tina-kulow/" target="_blank" class="ep-link">Zur Folge</a>
+    </div>
+
+    <div class="episode-card">
+      <div class="ep-tag">Kurzformat · Live-Event</div>
+      <div class="ep-title">Attention, Please! – Tech & Trara Spezial</div>
+      <div class="ep-desc">Ableger-Reihe unter 15 Minuten, aufgenommen auf einer Liveveranstaltung – neues Konzept, neuer Rhythmus.</div>
+      <a href="https://www.netzpiloten.de/attention-please-tech-trara-spezial-1-mit-moritz-meyer/" target="_blank" class="ep-link">Zur Folge</a>
+    </div>
+
+  </div>
+</section>
+
+<!-- FORMATE -->
+<div class="full-divider"></div>
+<section id="formate">
+  <div class="section-label">Formatvielfalt</div>
+  <h2>Was ich produzieren kann</h2>
+
+  <div class="formats-grid reveal">
+    <div class="format-item">
+      <span class="format-icon">🎙️</span>
+      <div class="format-title">Interview-Podcast</div>
+      <div class="format-desc">Gästeakquise, Briefing, Remote- und Vor-Ort-Aufnahmen. Von 15 min Kurzformat bis Langinterview.</div>
+    </div>
+    <div class="format-item">
+      <span class="format-icon">🔴</span>
+      <div class="format-title">Live-Aufnahmen</div>
+      <div class="format-desc">Podiumsgespräche, Bühneninterviews auf Konferenzen (Nextmedia.Hamburg, TransformIT Europe, Solutions u.a.).</div>
+    </div>
+    <div class="format-item">
+      <span class="format-icon">🤝</span>
+      <div class="format-title">Co-Produktionen</div>
+      <div class="format-desc">Externe Hosts, Partnernetzwerke (brand eins Podcast-Netzwerk, CGF), Themenspecials mit Organisationen.</div>
+    </div>
+    <div class="format-item">
+      <span class="format-icon">✂️</span>
+      <div class="format-title">Post-Produktion</div>
+      <div class="format-desc">Video- und Audio-Schnitt, Dynamische Ad-Einfügung, Intro/Outro, KI-gestützte Arbeitsabläufe, Episodenvisuals, Shownotes.</div>
+    </div>
+    <div class="format-item">
+      <span class="format-icon">📱</span>
+      <div class="format-title">Social Media Content</div>
+      <div class="format-desc">Audiogramme und Videoclips für LinkedIn, X & Instagram.</div>
+    </div>
+    <div class="format-item">
+      <span class="format-icon">📖</span>
+      <div class="format-title">Redaktion & Text</div>
+      <div class="format-desc">Episoden-Skripte, Shownotes, Folgenbeschreibungen, Social Media Texte, Begleitartikel.</div>
+    </div>
+  </div>
+
+  <div class="section-label" style="margin-top: 60px;">Live-Produktionen</div>
+  <p style="color: var(--muted); margin-bottom: 0; max-width: 600px; font-size: 15px; text-align: center; margin-left: auto; margin-right: auto;">
+    Auf diesen Veranstaltungen habe ich Folgen mitproduziert und Aufnahmen begleitet:
+  </p>
+  <div class="partnerships reveal">
+    <span class="partner-tag">Brand eins · Work Awesome</span>
+    <span class="partner-tag">Next Media Festival</span>
+    <span class="partner-tag">TransformIT Europe</span>
+    <span class="partner-tag">The (___) Gallery Hamburg</span>
+    <span class="partner-tag">Solutions Festival</span>
+    <span class="partner-tag">FinTech Week</span>
+  </div>
+</section>
+
+<!-- SKILLS & TOOLS -->
+<div class="full-divider"></div>
+<section id="skills">
+  <div class="section-label">Skills & Tools</div>
+  <h2>Was ich mitbringe</h2>
+
+  <!-- Growth callout -->
+  <div class="growth-callout reveal" style="background: var(--card); border: 1px solid var(--border); border-left: 3px solid var(--accent); padding: 32px; margin-bottom: 48px; text-align: center;">
+    <div style="font-family: 'DM Mono', monospace; font-size: 10px; color: var(--accent); letter-spacing: 0.2em; text-transform: uppercase; margin-bottom: 24px;">Wachstums-Story</div>
+    <div style="display: flex; gap: 24px; align-items: center; justify-content: center; max-width: 600px; margin: 0 auto 28px;">
+      <div style="display: flex; flex-direction: column; align-items: center;">
+        <div style="font-family: 'Playfair Display', serif; font-size: 36px; color: var(--muted); line-height: 1;">~394</div>
+        <div style="font-family: 'DM Mono', monospace; font-size: 10px; color: var(--muted); letter-spacing: 0.1em; margin-top: 8px; text-align: center;">STREAMS / FOLGE VORHER<br>1 & 2-wöchentl. Rhythmus</div>
+      </div>
+      <div style="font-size: 24px; color: var(--accent);">→</div>
+      <div style="display: flex; flex-direction: column; align-items: center;">
+        <div style="font-family: 'Playfair Display', serif; font-size: 36px; color: var(--accent); line-height: 1;">~850</div>
+        <div style="font-family: 'DM Mono', monospace; font-size: 10px; color: var(--muted); letter-spacing: 0.1em; margin-top: 8px; text-align: center;">STREAMS / FOLGE JETZT<br>monatlicher Rhythmus</div>
+      </div>
+    </div>
+    <!-- Simple bar chart -->
+    <div style="display: flex; align-items: flex-end; gap: 5px; height: 80px; margin: 0 auto 8px; max-width: 600px;">
+      <div style="flex:1; background: var(--border); height: 22%; border-radius: 2px 2px 0 0;"></div>
+      <div style="flex:1; background: var(--border); height: 25%; border-radius: 2px 2px 0 0;"></div>
+      <div style="flex:1; background: var(--border); height: 20%; border-radius: 2px 2px 0 0;"></div>
+      <div style="flex:1; background: var(--border); height: 28%; border-radius: 2px 2px 0 0;"></div>
+      <div style="flex:1; background: var(--border); height: 24%; border-radius: 2px 2px 0 0;"></div>
+      <div style="flex:1; background: var(--border); height: 30%; border-radius: 2px 2px 0 0;"></div>
+      <div style="flex:1; background: var(--border); height: 26%; border-radius: 2px 2px 0 0;"></div>
+      <div style="flex:1; background: var(--border); height: 32%; border-radius: 2px 2px 0 0;"></div>
+      <div style="flex:1; background: var(--border); height: 29%; border-radius: 2px 2px 0 0;"></div>
+      <div style="flex:1; background: var(--border); height: 35%; border-radius: 2px 2px 0 0;"></div>
+      <div style="flex:1; background: var(--muted); height: 48%; border-radius: 2px 2px 0 0; opacity: 0.5;"></div>
+      <div style="flex:1; background: var(--muted); height: 42%; border-radius: 2px 2px 0 0; opacity: 0.5;"></div>
+      <div style="flex:1; background: var(--accent); height: 62%; border-radius: 2px 2px 0 0; opacity: 0.7;"></div>
+      <div style="flex:1; background: var(--accent); height: 75%; border-radius: 2px 2px 0 0; opacity: 0.8;"></div>
+      <div style="flex:1; background: var(--accent); height: 82%; border-radius: 2px 2px 0 0; opacity: 0.9;"></div>
+      <div style="flex:1; background: var(--accent); height: 88%; border-radius: 2px 2px 0 0;"></div>
+      <div style="flex:1; background: var(--accent); height: 94%; border-radius: 2px 2px 0 0;"></div>
+      <div style="flex:1; background: var(--accent); height: 100%; border-radius: 2px 2px 0 0;"></div>
+    </div>
+    <div style="display: flex; justify-content: space-between; max-width: 600px; margin: 0 auto 20px;">
+      <div style="font-family: 'DM Mono', monospace; font-size: 9px; color: var(--muted); letter-spacing: 0.1em;">VOR ÜBERNAHME</div>
+      <div style="font-family: 'DM Mono', monospace; font-size: 9px; color: var(--accent); letter-spacing: 0.1em;">NACH ÜBERNAHME →</div>
+    </div>
+    <div style="font-size: 14px; color: var(--muted); max-width: 480px; line-height: 1.7; margin: 0 auto;">
+      +115% Steigerung pro Folge – bei gleichzeitiger Halbierung der Veröffentlichungsfrequenz.
+      Nachhaltigeres Wachstum durch Qualitätsfokus statt Quantität.
+    </div>
+  </div>
+
+  <div class="skills-layout reveal">
+    <div>
+      <div class="skill-block">
+        <h3>Produktion & Konzeption</h3>
+        <ul class="skill-list">
+          <li>Gesamtverantwortung Pre / Mid / Post-Produktion</li>
+          <li>Formatentwicklung & Konzepterstellung</li>
+          <li>Gästeakquise, Briefing & Betreuung</li>
+          <li>Remote-Aufnahmen & Vor-Ort-Produktion</li>
+          <li>Schnittanweisungen & Qualitätskontrolle</li>
+          <li>Schnitt & Tonbearbeitung</li>
+        </ul>
+      </div>
+      <div class="skill-block" style="margin-top: 32px;">
+        <h3>KI-Workflows</h3>
+        <ul class="skill-list">
+          <li>KI-optimierte Intros & Ansagestimmen (ElevenLabs)</li>
+          <li>Automatisierte Transkription & Kapitelmarken</li>
+          <li>KI-gestützte Shownotes & Beschreibungen</li>
+          <li>Kapitelvisuals via Bildgenerierung</li>
+        </ul>
+      </div>
+    </div>
+    <div>
+      <div class="skill-block">
+        <h3>Redaktion & Text</h3>
+        <ul class="skill-list">
+          <li>Interview-Vorbereitung & Themenrecherche</li>
+          <li>Redaktionsplanung & Themenentwicklung</li>
+          <li>Skript-Erstellung & Folgenablauf</li>
+          <li>Teaser-Texte</li>
+          <li>Shownotes, Folgenbeschreibungen & Verlinkungen</li>
+          <li>Social Media Content (LinkedIn, X, Instagram)</li>
+        </ul>
+      </div>
+      <div class="skill-block" style="margin-top: 32px;">
+        <h3>Distribution & Steuerung</h3>
+        <ul class="skill-list">
+          <li>Publishing & Planung über Podigee</li>
+          <li>Performance-Tracking & KPI-Auswertung</li>
+          <li>Steuerung externer Cutter*innen & Dienstleister*innen</li>
+          <li>Medienpartnerschaften & Syndication</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-label" style="margin-top: 60px;">Technologien</div>
+  <div class="tools-row reveal">
+    <span class="tool">Riverside</span>
+    <span class="tool">Podigee</span>
+    <span class="tool">Auphonic</span>
+    <span class="tool">ElevenLabs</span>
+    <span class="tool">DaVinci Resolve</span>
+    <span class="tool">FinalCut Pro</span>
+    <span class="tool">Pro Tools</span>
+    <span class="tool">Audacity</span>
+    <span class="tool">Wordpress</span>
+  </div>
+</section>
+
+<!-- PRESS / HIGHLIGHTS -->
+<div class="full-divider"></div>
+<section>
+  <div class="section-label press-section-label">Texten & Schreiben</div>
+  <h2 style="text-align: center;">Autorenprofil</h2>
+
+  <div class="reveal">
+    <div class="press-item">
+      <div>
+        <div class="press-title">Alle Artikel auf netzpiloten.de</div>
+        <div style="color: var(--muted); font-size: 14px; margin-top: 6px;">Übersicht aller veröffentlichten Beiträge – Erklärstücke, Analysen, Begleitartikel zu Tech & Trara.</div>
+      </div>
+      <div style="text-align: right;">
+        <div class="press-meta">Netzpiloten · 2021–heute</div>
+        <a href="https://www.netzpiloten.de/author/lennart-brauer/" target="_blank" class="press-link" style="display: block; margin-top: 8px;">Zum Profil →</a>
+      </div>
+    </div>
+
+    <div class="press-item">
+      <div>
+        <div class="press-title">Deepfakes als Unterhaltung</div>
+        <div style="color: var(--muted); font-size: 14px; margin-top: 6px;">Fachbeitrag für die Bundeszentrale für politische Bildung (BPB) – Teil eines Dossiers zu Deepfakes in Medien und Gesellschaft.</div>
+      </div>
+      <div style="text-align: right;">
+        <div class="press-meta">BPB · 2024</div>
+        <a href="https://www.bpb.de/lernen/bewegtbild-und-politische-bildung/556809/deepfakes-als-unterhaltung/" target="_blank" class="press-link" style="display: block; margin-top: 8px;">Lesen →</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<div class="full-divider"></div>
+<div class="contact-section" id="kontakt">
+  <div class="section-label" style="justify-content: center; margin-bottom: 24px;">Zusammenarbeiten</div>
+  <h2>Bereit für den<br><em>nächsten Podcast.</em></h2>
+  <p>Du suchst jemanden, mit dem du kreative Formate entwickeln, deinen bestehenden Podcast optimieren oder einen neuen Podcast in Eigenverantwortung produzieren kannst?</p>
+  <div class="cta-row">
+    <a href="mailto:lennartbrauer@gmx.de" class="btn btn-primary">Mail</a>
+    <a href="https://www.linkedin.com/in/lennart-brauer" target="_blank" class="btn btn-secondary">LinkedIn</a>
+  </div>
+  <p style="font-family: 'DM Mono', monospace; font-size: 11px; color: var(--muted); margin-top: 48px; margin-bottom: 0;">
+    <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="9af6fff4f4fbe8eef8e8fbefffe8dafdf7e2b4feff">[email&#160;protected]</a> &nbsp;·&nbsp; +49 152 04225823 &nbsp;·&nbsp; Hamburg
+  </p>
+</div>
+
+<script>
+  // Waveform generator – run immediately on DOM ready
+  function initWaveform() {
+    const waveform = document.getElementById('waveform');
+    if (!waveform) return;
+    const count = Math.floor((window.innerWidth || 800) / 8);
+    for (let i = 0; i < count; i++) {
+      const bar = document.createElement('span');
+      const h = 20 + Math.random() * 160;
+      bar.style.height = h + 'px';
+      bar.style.animationDelay = (Math.random() * 2) + 's';
+      bar.style.animationDuration = (1.2 + Math.random() * 1.4) + 's';
+      waveform.appendChild(bar);
+    }
+  }
+
+  // Scroll reveal – immediately reveal anything already in view,
+  // use rootMargin so elements near the viewport also trigger
+  function initReveal() {
+    const reveals = document.querySelectorAll('.reveal');
+
+    // If IntersectionObserver not available, just show everything
+    if (!window.IntersectionObserver) {
+      reveals.forEach(el => el.classList.add('visible'));
+      return;
+    }
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+          observer.unobserve(entry.target);
+        }
+      });
+    }, {
+      threshold: 0,
+      rootMargin: '0px 0px -40px 0px'
+    });
+
+    reveals.forEach(el => observer.observe(el));
+
+    // Fallback: after 300ms, force-reveal anything still invisible
+    // (handles iframe cases where observer never fires)
+    setTimeout(() => {
+      reveals.forEach(el => {
+        const rect = el.getBoundingClientRect();
+        if (rect.top < (window.innerHeight || 800) + 200) {
+          el.classList.add('visible');
+        }
+      });
+    }, 300);
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => { initWaveform(); initReveal(); });
+  } else {
+    initWaveform();
+    initReveal();
+  }
+</script>
